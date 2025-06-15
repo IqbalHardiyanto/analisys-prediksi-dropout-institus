@@ -38,34 +38,47 @@ def clean_and_convert(value):
 # Fungsi untuk memproses dataframe
 def preprocess_dataframe(df):
     """Lakukan preprocessing pada dataframe input"""
-    # Konversi nama kolom ke format standar
-    df.columns = [re.sub(r'\W+', '_', col.strip()).lower() for col in df.columns]
+    # Normalisasi nama kolom: lowercase dan ganti spasi/tanda baca
+    df.columns = [col.strip().lower().replace(' ', '_').replace('-', '_') 
+                 for col in df.columns]
     
-    # Daftar kolom yang perlu dikonversi ke numerik
-    numeric_cols = [
-        'curricular_units_1st_sem_grade', 
-        'curricular_units_2nd_sem_grade',
-        'curricular_units_1st_sem_approved',
-        'curricular_units_1st_sem_enrolled',
-        'curricular_units_2nd_sem_approved',
-        'curricular_units_2nd_sem_enrolled',
-        'age_at_enrollment',
-        'tuition_fees_up_to_date',
-        'scholarship_holder',
-        'debtor',
-        'international'
-    ]
+    # Daftar mapping kolom kritis
+    column_mapping = {
+        'curricular_units_1st_sem_(grade|approved|enrolled)': 'curricular_units_1st_sem_',
+        'curricular_units_2nd_sem_(grade|approved|enrolled)': 'curricular_units_2nd_sem_',
+        'marital_status': 'marital_status',
+        'application_mode': 'application_mode',
+        'age_at_enrollment': 'age_at_enrollment',
+        'tuition_fees_up_to_date': 'tuition_fees_up_to_date',
+        'scholarship_holder': 'scholarship_holder',
+        'debtor': 'debtor',
+        'international': 'international',
+        'status': 'status'
+    }
     
-    # Konversi tipe data
+    # Standarisasi nama kolom
+    new_columns = []
+    for col in df.columns:
+        matched = False
+        for pattern, replacement in column_mapping.items():
+            if re.search(pattern, col, re.IGNORECASE):
+                new_col = re.sub(pattern, replacement, col, flags=re.IGNORECASE)
+                new_columns.append(new_col)
+                matched = True
+                break
+        if not matched:
+            new_columns.append(col)
+    
+    df.columns = new_columns
+    
+    # Konversi tipe data untuk kolom kritis
+    numeric_cols = ['curricular_units_1st_sem_grade', 
+                   'curricular_units_2nd_sem_grade',
+                   'age_at_enrollment']
+    
     for col in numeric_cols:
         if col in df.columns:
-            df[col] = df[col].apply(clean_and_convert)
-        else:
-            st.warning(f"Kolom {col} tidak ditemukan, menggunakan nilai default 0")
-            df[col] = 0.0
-    
-    # Isi nilai kosong
-    df.fillna(0, inplace=True)
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     
     return df
 
