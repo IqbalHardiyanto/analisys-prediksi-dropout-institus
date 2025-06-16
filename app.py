@@ -286,7 +286,7 @@ if st.button("Prediksi Status"):
             st.warning("Perhatian! Mahasiswa ini memiliki risiko tinggi untuk Dropout. Intervensi mungkin diperlukan.")
         else:
             st.markdown(
-                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div>",
+                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div><br>",
                 unsafe_allow_html=True
             )
             st.success("Bagus! Mahasiswa ini diprediksi akan Lulus.")
@@ -297,9 +297,9 @@ if st.button("Prediksi Status"):
         st.info(f"Probabilitas Keluar (Dropout): **{probabilities[1]*100:.2f}%**")
 
         st.markdown("---")
-        st.subheader("Fitur yang Digunakan dalam Prediksi")
-        # Menampilkan fitur input beserta fitur turunan
-        st.json(final_input_for_prediction.iloc[0].to_dict())
+        # st.subheader("Fitur yang Digunakan dalam Prediksi")
+        # # Menampilkan fitur input beserta fitur turunan
+        # st.json(final_input_for_prediction.iloc[0].to_dict())
 
 # Penjelasan Singkat Aplikasi
 st.sidebar.title("Tentang Aplikasi Ini")
