@@ -53,9 +53,6 @@ def load_model_and_preprocessor():
 
     try:
         model = joblib.load(model_path)
-        # Preprocessor sebenarnya sudah termasuk dalam pipeline model,
-        # tetapi jika diperlukan terpisah, bisa dimuat juga.
-        # Untuk kasus ini, pipeline model sudah menangani preprocessing.
         return model
     except Exception as e:
         st.error(f"Gagal memuat model atau preprocessor. Error: {e}")
@@ -108,7 +105,7 @@ st.markdown(
         border-radius: 8px;
     }
     .warning-box {
-        background-color: #fff3cd; /* Warna latar belakang kuning muda */
+        background-color: #F1BA88; /* Warna latar belakang kuning muda */
         border-left: 5px solid #ffc107; /* Warna border kuning */
         padding: 15px;
         margin-top: 20px;
