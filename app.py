@@ -277,7 +277,7 @@ if st.button("Prediksi Status"):
         st.subheader("Hasil Prediksi")
         if status == "Dropout":
             st.markdown(
-                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div>",
+                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div><br>",
                 unsafe_allow_html=True
             )
             st.warning("Perhatian! Mahasiswa ini memiliki risiko tinggi untuk Dropout. Intervensi mungkin diperlukan.")
