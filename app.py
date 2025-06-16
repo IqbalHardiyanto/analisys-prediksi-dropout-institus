@@ -115,7 +115,7 @@ st.markdown(
         border-radius: 8px;
     }
     .success-box {
-        background-color: #d4edda;
+        background-color: #03A791;
         border-left: 5px solid #28a745;
         padding: 15px;
         margin-top: 20px;
@@ -301,10 +301,10 @@ if st.button("Prediksi Status"):
         # Menampilkan fitur input beserta fitur turunan
         st.json(final_input_for_prediction.iloc[0].to_dict())
 
-# --- Penjelasan Singkat Aplikasi ---
+# Penjelasan Singkat Aplikasi
 st.sidebar.title("Tentang Aplikasi Ini")
 st.sidebar.info(
-    "Aplikasi ini menggunakan model Machine Learning (terbaik dari Random Forest, XGBoost, dan SVM) "
+    "Aplikasi ini menggunakan model Machine Learning (terbaik dari Random Forest) "
     "untuk memprediksi status kelulusan mahasiswa (Lulus/Dropout). "
     "Model dilatih dengan data historis untuk mengidentifikasi pola yang mengarah pada dropout."
     "\n\n"
