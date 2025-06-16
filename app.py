@@ -352,7 +352,7 @@ if st.button("Prediksi Status"):
         st.info(f"Probabilitas Keluar (Dropout): {probabilities[1]*100:.2f}%")
 
         st.markdown("---")
-        st.subheader("Fitur yang Digunakan dalam Prediksi")
+        # st.subheader("Fitur yang Digunakan dalam Prediksi")
         # Menampilkan fitur input beserta fitur turunan
         # st.json(final_input_for_prediction.iloc[0].to_dict())
 
