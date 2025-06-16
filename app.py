@@ -77,6 +77,7 @@ st.markdown(
     }
     .stButton>button:hover {
         background-color: #45a049;
+        color :#ECFAE5;
     }
     .stTextInput>div>div>input {
         border-radius: 8px;
@@ -101,8 +102,8 @@ st.markdown(
         border-radius: 8px;
     }
     .warning-box {
-        background-color: #FFD63A; /* Warna latar belakang kuning muda */
-        border-left: 5px solid #ffc107; /* Warna border kuning */
+        background-color: #FFD63A;
+        border-left: 5px solid #ffc107;
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
@@ -282,12 +283,11 @@ if st.button("Prediksi Status"):
         st.subheader("Hasil Prediksi")
         if status == "Dropout":
             st.markdown(
-                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div>",
+                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div><br>",
                 unsafe_allow_html=True
             )
             st.warning("Perhatian! Mahasiswa ini memiliki risiko tinggi untuk Dropout. Intervensi mungkin diperlukan.")
 
-            # --- Rekomendasi Action Items untuk Dropout ---
             st.markdown("---")
             st.subheader("Rekomendasi Action Items")
 
@@ -341,7 +341,7 @@ if st.button("Prediksi Status"):
 
         else: # status == "Graduate"
             st.markdown(
-                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div>",
+                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div><br>",
                 unsafe_allow_html=True
             )
             st.success("Bagus! Mahasiswa ini diprediksi akan Lulus.")
