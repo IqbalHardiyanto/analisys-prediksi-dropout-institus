@@ -36,14 +36,14 @@ def inference_derived_features(input_df):
 # --- Load Model dan Preprocessor ---
 @st.cache_resource # Cache resource agar model tidak dimuat ulang setiap kali ada interaksi UI
 def load_model_and_preprocessor():
-    model_path = 'models/best_model.joblib'
-    preprocessor_path = 'models/preprocessor.joblib'
+    model_path = 'model/best_model.joblib'
+    preprocessor_path = 'model/preprocessor.joblib'
 
     if not os.path.exists(model_path) or not os.path.exists(preprocessor_path):
         st.error(
             "File model atau preprocessor tidak ditemukan! "
             "Pastikan Anda telah menjalankan skrip ML asli untuk melatih dan menyimpan model, "
-            "dan file-file tersebut berada di folder 'models/'."
+            "dan file-file tersebut berada di folder 'model/'."
         )
         st.stop() # Hentikan eksekusi aplikasi jika file tidak ditemukan
 
