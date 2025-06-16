@@ -28,9 +28,18 @@ model = load_components()
 def clean_and_convert(value):
     """Konversi nilai ke float dengan penanganan khusus"""
     try:
-        # Handle format angka Eropa (1.000,00)
+        # Handle format angka yang tidak standar
         if isinstance(value, str):
+            # Tangani kasus khusus seperti "13.666.666.666.666.600"
+            if value.count('.') > 1:
+                # Ambil bagian pertama saja
+                value = value.split('.')[0] + '.' + value.split('.')[1]
+            
             value = value.replace('.', '').replace(',', '.')
+            # Tangani nilai yang tidak valid
+            if value == '' or value.lower() == 'nan':
+                return 0.0
+                
         return float(value)
     except:
         return 0.0
@@ -39,10 +48,9 @@ def clean_and_convert(value):
 def preprocess_dataframe(df):
     """Lakukan preprocessing pada dataframe input"""
     # Normalisasi nama kolom: lowercase dan ganti spasi/tanda baca
-    df.columns = [col.strip().lower().replace(' ', '_').replace('-', '_') 
-                 for col in df.columns]
+    df.columns = [re.sub(r'\W+', '_', col.strip()).lower() for col in df.columns]
     
-    # Daftar mapping kolom kritis
+    # Mapping nama kolom untuk konsistensi
     column_mapping = {
         'curricular_units_1st_sem_(grade|approved|enrolled)': 'curricular_units_1st_sem_',
         'curricular_units_2nd_sem_(grade|approved|enrolled)': 'curricular_units_2nd_sem_',
@@ -53,6 +61,7 @@ def preprocess_dataframe(df):
         'scholarship_holder': 'scholarship_holder',
         'debtor': 'debtor',
         'international': 'international',
+        'mothers_occupation': 'mothers_occupation',
         'status': 'status'
     }
     
@@ -72,44 +81,62 @@ def preprocess_dataframe(df):
     df.columns = new_columns
     
     # Konversi tipe data untuk kolom kritis
-    numeric_cols = ['curricular_units_1st_sem_grade', 
-                   'curricular_units_2nd_sem_grade',
-                   'age_at_enrollment']
+    numeric_cols = [
+        'curricular_units_1st_sem_grade', 
+        'curricular_units_2nd_sem_grade',
+        'curricular_units_1st_sem_approved',
+        'curricular_units_1st_sem_enrolled',
+        'curricular_units_2nd_sem_approved',
+        'curricular_units_2nd_sem_enrolled',
+        'age_at_enrollment',
+        'tuition_fees_up_to_date',
+        'scholarship_holder',
+        'debtor',
+        'international'
+    ]
     
+    # Konversi tipe data
     for col in numeric_cols:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            df[col] = df[col].apply(clean_and_convert)
+        else:
+            st.warning(f"Kolom {col} tidak ditemukan, menggunakan nilai default 0")
+            df[col] = 0.0
+    
+    # Isi nilai kosong
+    df.fillna(0, inplace=True)
     
     return df
 
 # Fungsi feature engineering
 def add_derived_features(df):
     """Tambahkan fitur turunan"""
-    df['ipk_semester1'] = (df['curricular_units_1st_sem_grade'] / 20) * 4
-    df['ipk_semester2'] = (df['curricular_units_2nd_sem_grade'] / 20) * 4
+    # Gunakan nama fitur sesuai model (case-sensitive)
+    df['Ipk_semester1'] = (df['Curricular_units_1st_sem_grade'] / 20) * 4
+    df['Ipk_semester2'] = (df['Curricular_units_2nd_sem_grade'] / 20) * 4
     
     # Handle pembagian oleh nol
     df['proporsi_sks_1'] = df.apply(
-        lambda x: x['curricular_units_1st_sem_approved'] / 
-        max(x['curricular_units_1st_sem_enrolled'], 1), 
+        lambda x: x['Curricular_units_1st_sem_approved'] / 
+        max(x['Curricular_units_1st_sem_enrolled'], 1), 
         axis=1
     )
     
     df['proporsi_sks_2'] = df.apply(
-        lambda x: x['curricular_units_2nd_sem_approved'] / 
-        max(x['curricular_units_2nd_sem_enrolled'], 1), 
+        lambda x: x['Curricular_units_2nd_sem_approved'] / 
+        max(x['Curricular_units_2nd_sem_enrolled'], 1), 
         axis=1
     )
     
-    df['index_ipk'] = df['ipk_semester2'] - df['ipk_semester1']
-    df['kemajuan_sks'] = df['curricular_units_2nd_sem_approved'] - df['curricular_units_1st_sem_approved']
+    df['index_ipk'] = df['Ipk_semester2'] - df['Ipk_semester1']
+    df['kemajuan_sks'] = df['Curricular_units_2nd_sem_approved'] - df['Curricular_units_1st_sem_approved']
     
     # Pastikan nilai boolean
-    df['tuition_fees_up_to_date'] = df['tuition_fees_up_to_date'].apply(lambda x: 1 if x == 1 else 0)
-    df['debtor'] = df['debtor'].apply(lambda x: 1 if x == 1 else 0)
+    df['Tuition_fees_up_to_date'] = df['Tuition_fees_up_to_date'].apply(lambda x: 1 if x == 1 else 0)
+    df['Debtor'] = df['Debtor'].apply(lambda x: 1 if x == 1 else 0)
     
     df['status_pembayaran'] = df.apply(
-        lambda x: (0 if x['tuition_fees_up_to_date'] == 1 else 1) + x['debtor'], 
+        lambda x: (0 if x['Tuition_fees_up_to_date'] == 1 else 1) + x['Debtor'], 
         axis=1
     )
     
@@ -121,19 +148,32 @@ def predict_dropout_risk(df):
     try:
         processed_df = add_derived_features(df.copy())
         
-        # Fitur yang digunakan model
+        # Fitur yang digunakan model (sesuai dengan model training)
         features = [
-            'curricular_units_1st_sem_enrolled', 'curricular_units_1st_sem_approved',
-            'curricular_units_2nd_sem_enrolled', 'curricular_units_2nd_sem_approved', 'international',
-            'mothers_occupation', 'ipk_semester1', 'ipk_semester2', 'age_at_enrollment', 'tuition_fees_up_to_date',
-            'scholarship_holder', 'debtor', 'proporsi_sks_1', 'proporsi_sks_2',
-            'index_ipk', 'kemajuan_sks', 'status_pembayaran'
+            'Curricular_units_1st_sem_enrolled', 
+            'Curricular_units_1st_sem_approved',
+            'Curricular_units_2nd_sem_enrolled', 
+            'Curricular_units_2nd_sem_approved', 
+            'International',
+            'Mothers_occupation', 
+            'Ipk_semester1', 
+            'Ipk_semester2', 
+            'Age_at_enrollment', 
+            'Tuition_fees_up_to_date',
+            'Scholarship_holder', 
+            'Debtor', 
+            'proporsi_sks_1', 
+            'proporsi_sks_2',
+            'index_ipk', 
+            'kemajuan_sks', 
+            'status_pembayaran'
         ]
         
         # Pastikan semua fitur ada
         for feature in features:
             if feature not in processed_df.columns:
                 st.error(f"Fitur penting tidak ditemukan: {feature}")
+                # Berikan nilai default jika fitur tidak ada
                 processed_df[feature] = 0
         
         X = processed_df[features]
@@ -218,31 +258,32 @@ with tab1:
     st.subheader("Upload Data Siswa")
     
     # Tampilkan contoh data
-    with st.expander("Contoh Format Data"):
-        example_data = {
-            'Student_ID': [101, 102],
-            'Curricular_units_1st_sem_grade': [14.5, 9.8],
-            'Curricular_units_2nd_sem_grade': [12.0, 8.5],
-            'Curricular_units_1st_sem_approved': [5, 3],
-            'Curricular_units_1st_sem_enrolled': [6, 6],
-            'Curricular_units_2nd_sem_approved': [4, 2],
-            'Curricular_units_2nd_sem_enrolled': [6, 6],
-            'Age_at_enrollment': [19, 21],
-            'Tuition_fees_up_to_date': [1, 0],
-            'Scholarship_holder': [0, 1],
-            'Debtor': [0, 1],
-            'International': [0, 0],
-            'Mothers_occupation': [5, 9],
-            'Course': ['Computer Science', 'Business']
-        }
-        example_df = pd.DataFrame(example_data)
-        st.dataframe(example_df)
-        st.download_button(
-            "📥 Download Contoh Data",
-            example_df.to_csv(index=False).encode('utf-8'),
-            "contoh_data_siswa.csv",
-            "text/csv"
-        )
+    # Di dalam with tab1:
+with st.expander("Contoh Format Data"):
+    example_data = {
+        'Student_ID': [101, 102],
+        'Curricular_units_1st_sem_grade': [14.5, 9.8],
+        'Curricular_units_2nd_sem_grade': [12.0, 8.5],
+        'Curricular_units_1st_sem_approved': [5, 3],
+        'Curricular_units_1st_sem_enrolled': [6, 6],
+        'Curricular_units_2nd_sem_approved': [4, 2],
+        'Curricular_units_2nd_sem_enrolled': [6, 6],
+        'Age_at_enrollment': [19, 21],
+        'Tuition_fees_up_to_date': [1, 0],
+        'Scholarship_holder': [0, 1],
+        'Debtor': [0, 1],
+        'International': [0, 0],
+        'Mothers_occupation': [5, 9],
+        'Course': ['Computer Science', 'Business']
+    }
+    example_df = pd.DataFrame(example_data)
+    st.dataframe(example_df)
+    st.download_button(
+        "📥 Download Contoh Data",
+        example_df.to_csv(index=False).encode('utf-8'),
+        "contoh_data_siswa.csv",
+        "text/csv"
+    )
     
     uploaded_file = st.file_uploader("Pilih file CSV", type="csv")
     
