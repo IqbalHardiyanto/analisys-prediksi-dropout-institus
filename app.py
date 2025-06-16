@@ -77,7 +77,6 @@ st.markdown(
     }
     .stButton>button:hover {
         background-color: #45a049;
-        color :#ECFAE5;
     }
     .stTextInput>div>div>input {
         border-radius: 8px;
@@ -102,22 +101,22 @@ st.markdown(
         border-radius: 8px;
     }
     .warning-box {
-        background-color: #FFD63A;
-        border-left: 5px solid #ffc107;
+        background-color: #FFD63A; /* Warna latar belakang kuning muda */
+        border-left: 5px solid #ffc107; /* Warna border kuning */
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
     }
     .success-box {
-        background-color: #118B50;
-        border-left: 5px solid #B4EBE6;
+        background-color: #1F7D53;
+        border-left: 5px solid #1F7D53;
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
     }
     .action-item-box {
-        background-color: #B4EBE6;
-        border-left: 4px solid #B4EBE6;
+        background-color: #393E46;
+        border-left: 4px solid #393E46;
         padding: 15px;
         margin-top: 15px;
         border-radius: 8px;
@@ -288,6 +287,7 @@ if st.button("Prediksi Status"):
             )
             st.warning("Perhatian! Mahasiswa ini memiliki risiko tinggi untuk Dropout. Intervensi mungkin diperlukan.")
 
+            
             st.markdown("---")
             st.subheader("Rekomendasi Action Items")
 
