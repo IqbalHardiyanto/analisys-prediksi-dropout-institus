@@ -4,7 +4,6 @@ import joblib
 import numpy as np
 import os
 
-# --- Konfigurasi Halaman Streamlit ---
 
 st.set_page_config(
     page_title="Prediksi Status Kelulusan Mahasiswa",
@@ -15,9 +14,6 @@ st.set_page_config(
 
 # Fungsi untuk menambahkan fitur turunan yang sama seperti saat pelatihan model
 def inference_derived_features(input_df):
-    """
-    Menambahkan fitur turunan ke dataframe input yang digunakan untuk inferensi.
-    """
     # Konversi ke skala 4.0
     input_df['Ipk_semester1'] = (input_df['Curricular_units_1st_sem_grade'] / 20) * 4
     input_df['Ipk_semester2'] = (input_df['Curricular_units_2nd_sem_grade'] / 20) * 4
@@ -53,10 +49,13 @@ def load_model_and_preprocessor():
             "Pastikan Anda telah menjalankan skrip ML asli untuk melatih dan menyimpan model, "
             "dan file-file tersebut berada di folder 'model/'."
         )
-        st.stop()
+        st.stop() # Hentikan eksekusi aplikasi jika file tidak ditemukan
 
     try:
         model = joblib.load(model_path)
+        # Preprocessor sebenarnya sudah termasuk dalam pipeline model,
+        # tetapi jika diperlukan terpisah, bisa dimuat juga.
+        # Untuk kasus ini, pipeline model sudah menangani preprocessing.
         return model
     except Exception as e:
         st.error(f"Gagal memuat model atau preprocessor. Error: {e}")
@@ -109,8 +108,8 @@ st.markdown(
         border-radius: 8px;
     }
     .warning-box {
-        background-color: #fff3cd;
-        border-left: 5px solid #ffc107;
+        background-color: #fff3cd; /* Warna latar belakang kuning muda */
+        border-left: 5px solid #ffc107; /* Warna border kuning */
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
@@ -133,7 +132,7 @@ st.markdown(
 st.title("🎓 Prediksi Status Kelulusan Mahasiswa")
 st.markdown("Aplikasi ini memprediksi apakah seorang mahasiswa cenderung **Lulus (Graduate)** atau **Keluar (Dropout)** berdasarkan data akademik dan demografi.")
 
-# --- Formulir Input Data Mahasiswa ---
+# Formulir Input Data Mahasiswa
 st.header("Masukkan Data Mahasiswa")
 
 # Menggunakan st.columns untuk layout 2 kolom
@@ -320,4 +319,4 @@ st.sidebar.markdown(
     """
 )
 st.sidebar.markdown("---")
-st.sidebar.write("Dibuat dengan spirit 🔥🔥🚀 ")
+st.sidebar.write("Dibuat dengan Spirit 🔥🔥🔥")
