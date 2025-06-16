@@ -2,17 +2,17 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-import os # Untuk memeriksa keberadaan file
+import os
 
 # --- Konfigurasi Halaman Streamlit ---
-# st.set_page_config() HARUS menjadi perintah Streamlit pertama yang dipanggil.
+
 st.set_page_config(
     page_title="Prediksi Status Kelulusan Mahasiswa",
     page_icon="🎓",
     layout="centered"
 )
 
-# --- Helper Functions (dari kode ML Anda) ---
+
 # Fungsi untuk menambahkan fitur turunan yang sama seperti saat pelatihan model
 def inference_derived_features(input_df):
     """
@@ -44,22 +44,19 @@ def inference_derived_features(input_df):
 # --- Load Model dan Preprocessor ---
 @st.cache_resource # Cache resource agar model tidak dimuat ulang setiap kali ada interaksi UI
 def load_model_and_preprocessor():
-    model_path = 'models/best_model.joblib'
-    preprocessor_path = 'models/preprocessor.joblib'
+    model_path = 'model/best_model.joblib'
+    preprocessor_path = 'model/preprocessor.joblib'
 
     if not os.path.exists(model_path) or not os.path.exists(preprocessor_path):
         st.error(
             "File model atau preprocessor tidak ditemukan! "
             "Pastikan Anda telah menjalankan skrip ML asli untuk melatih dan menyimpan model, "
-            "dan file-file tersebut berada di folder 'models/'."
+            "dan file-file tersebut berada di folder 'model/'."
         )
-        st.stop() # Hentikan eksekusi aplikasi jika file tidak ditemukan
+        st.stop()
 
     try:
         model = joblib.load(model_path)
-        # Preprocessor sebenarnya sudah termasuk dalam pipeline model,
-        # tetapi jika diperlukan terpisah, bisa dimuat juga.
-        # Untuk kasus ini, pipeline model sudah menangani preprocessing.
         return model
     except Exception as e:
         st.error(f"Gagal memuat model atau preprocessor. Error: {e}")
@@ -261,8 +258,6 @@ if st.button("Prediksi Status"):
     # Tambahkan fitur turunan
     processed_input_df = inference_derived_features(input_df)
 
-    # Pastikan urutan kolom sesuai dengan yang diharapkan model
-    # Ini adalah `model_features` yang Anda definisikan di skrip ML
     model_features_order = [
         'Curricular_units_1st_sem_enrolled', 'Curricular_units_1st_sem_approved',
         'Curricular_units_2nd_sem_enrolled', 'Curricular_units_2nd_sem_approved',
