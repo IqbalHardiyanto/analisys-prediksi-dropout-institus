@@ -11,15 +11,14 @@ st.set_page_config(
     layout="centered"
 )
 
-
-# Fungsi untuk menambahkan fitur turunan yang sama seperti saat pelatihan model
 def inference_derived_features(input_df):
     # Konversi ke skala 4.0
+    
     input_df['Ipk_semester1'] = (input_df['Curricular_units_1st_sem_grade'] / 20) * 4
     input_df['Ipk_semester2'] = (input_df['Curricular_units_2nd_sem_grade'] / 20) * 4
 
     # Proporsi SKS yang diluluskan semester 1 & 2
-    # Menggunakan .replace(0, 1) untuk menghindari pembagian dengan nol jika ada
+    
     input_df['proporsi_sks_1'] = input_df['Curricular_units_1st_sem_approved'] / input_df['Curricular_units_1st_sem_enrolled'].replace(0, 1)
     input_df['proporsi_sks_2'] = input_df['Curricular_units_2nd_sem_approved'] / input_df['Curricular_units_2nd_sem_enrolled'].replace(0, 1)
 
@@ -29,16 +28,12 @@ def inference_derived_features(input_df):
     # Kemajuan jumlah SKS lulus semester 2 dibanding semester 1
     input_df['kemajuan_sks'] = input_df['Curricular_units_2nd_sem_approved'] - input_df['Curricular_units_1st_sem_approved']
 
-    # Skor status pembayaran: 0 = lancar, 1 = ada salah satu kendala, 2 = keduanya bermasalah
-    # Asumsi Tuition_fees_up_to_date: 1 = Lancar, 0 = Tidak Lancar.
-    # Jika 0 (Tidak Lancar) maka skor 1. Jika 1 (Lancar) maka skor 0.
-    # Debtor: 1 = Ya (skor 1), 0 = Tidak (skor 0).
     input_df['status_pembayaran'] = input_df['Tuition_fees_up_to_date'].apply(lambda x: 0 if x == 1 else 1) + input_df['Debtor']
 
     return input_df
 
 # --- Load Model dan Preprocessor ---
-@st.cache_resource # Cache resource agar model tidak dimuat ulang setiap kali ada interaksi UI
+@st.cache_resource
 def load_model_and_preprocessor():
     model_path = 'model/best_model.joblib'
     preprocessor_path = 'model/preprocessor.joblib'
@@ -49,10 +44,11 @@ def load_model_and_preprocessor():
             "Pastikan Anda telah menjalankan skrip ML asli untuk melatih dan menyimpan model, "
             "dan file-file tersebut berada di folder 'model/'."
         )
-        st.stop() # Hentikan eksekusi aplikasi jika file tidak ditemukan
+        st.stop()
 
     try:
         model = joblib.load(model_path)
+        
         return model
     except Exception as e:
         st.error(f"Gagal memuat model atau preprocessor. Error: {e}")
@@ -98,28 +94,37 @@ st.markdown(
         padding: 8px;
     }
     .prediction-box {
-        background-color: #e6f7ff;
-        border-left: 5px solid #2196F3;
+        background-color: #8ACCD5;
+        border-left: 5px solid #8ACCD5;
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
     }
     .warning-box {
-        background-color: #F1BA88; /* Warna latar belakang kuning muda */
+        background-color: #FFD63A; /* Warna latar belakang kuning muda */
         border-left: 5px solid #ffc107; /* Warna border kuning */
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
     }
     .success-box {
-        background-color: #03A791;
-        border-left: 5px solid #28a745;
+        background-color: #118B50;
+        border-left: 5px solid #B4EBE6;
         padding: 15px;
         margin-top: 20px;
         border-radius: 8px;
     }
-    h1, h2, h3 {
-        color: #2c3e50;
+    .action-item-box {
+        background-color: #B4EBE6;
+        border-left: 4px solid #B4EBE6;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+    }
+    .action-item-title {
+        font-weight: bold;
+        color: #FBF8EF;
+        margin-bottom: 5px;
     }
     </style>
     """,
@@ -129,7 +134,7 @@ st.markdown(
 st.title("🎓 Prediksi Status Kelulusan Mahasiswa")
 st.markdown("Aplikasi ini memprediksi apakah seorang mahasiswa cenderung **Lulus (Graduate)** atau **Keluar (Dropout)** berdasarkan data akademik dan demografi.")
 
-# Formulir Input Data Mahasiswa
+# --- Formulir Input Data Mahasiswa ---
 st.header("Masukkan Data Mahasiswa")
 
 # Menggunakan st.columns untuk layout 2 kolom
@@ -185,7 +190,7 @@ with col2:
         help="Kode numerik untuk pekerjaan ibu (sesuai dataset asli). Contoh: 9 (Pekerja Jasa), 12 (Pekerja Terampil), dll."
     )
 
-st.markdown("---") # Garis pemisah untuk keterbacaan
+st.markdown("---")
 
 col3, col4 = st.columns(2)
 
@@ -277,13 +282,66 @@ if st.button("Prediksi Status"):
         st.subheader("Hasil Prediksi")
         if status == "Dropout":
             st.markdown(
-                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div><br>",
+                f"<div class='warning-box'>Status Prediksi: <b>{status}</b></div>",
                 unsafe_allow_html=True
             )
             st.warning("Perhatian! Mahasiswa ini memiliki risiko tinggi untuk Dropout. Intervensi mungkin diperlukan.")
-        else:
+
+            # --- Rekomendasi Action Items untuk Dropout ---
+            st.markdown("---")
+            st.subheader("Rekomendasi Action Items")
+
+            # Ambil nilai fitur dari processed_input_df (yang sudah termasuk fitur turunan)
+            current_ipk1 = processed_input_df['Ipk_semester1'].iloc[0]
+            current_proporsi_sks_1 = processed_input_df['proporsi_sks_1'].iloc[0]
+            current_debtor_status = processed_input_df['Debtor'].iloc[0]
+            current_mothers_occupation = processed_input_df['Mothers_occupation'].iloc[0]
+            current_international_status = processed_input_df['International'].iloc[0]
+            current_age_at_enrollment = processed_input_df['Age_at_enrollment'].iloc[0]
+
+            # a) Program Intervensi Akademik
+            # Menggunakan Ipk_semester1 dan proporsi_sks_1 sebagai proxy untuk "kinerja semester pertama buruk"
+            # Threshold Ipk_semester1 < 2.5 (skala 4.0) atau proporsi SKS < 0.5 (50%)
+            if current_ipk1 < 2.5 or current_proporsi_sks_1 < 0.5:
+                st.markdown(
+                    "<div class='action-item-box'>"
+                    "<div class='action-item-title'>a) Program Intervensi Akademik</div>"
+                    "- **Target**: Mahasiswa dengan kinerja semester pertama buruk (IPK & proporsi SKS rendah).<br>"
+                    "- **Aksi**: Berikan <i>remedial class</i> gratis dan pendampingan mentor akademik. Monitor perkembangan melalui <i>early warning system</i>.<br>"
+                    "- **Metrik Sukses**: Penurunan 30% dropout pada kelompok ini dalam 1 tahun."
+                    "</div>", unsafe_allow_html=True
+                )
+
+            # b) Dukungan Finansial & Sosial
+            if current_debtor_status == 1 and current_mothers_occupation == 9:
+                st.markdown(
+                    "<div class='action-item-box'>"
+                    "<div class='action-item-title'>b) Dukungan Finansial & Sosial</div>"
+                    "- **Target**: Mahasiswa <i>debtor</i> dan status ekonomi rendah (pekerjaan ibu: Pekerja Tidak Terampil/Jasa).<br>"
+                    "- **Aksi**: Tingkatkan akses beasiswa dan <i>flexible payment plan</i>. Buka layanan konseling untuk masalah non-akademik.<br>"
+                    "- **Metrik Sukses**: Penurunan 40% siswa <i>debtor</i> yang dropout dalam 2 tahun."
+                    "</div>", unsafe_allow_html=True
+                )
+
+            # c) Optimasi Rekrutmen & Retensi
+            if current_international_status == 1 and current_age_at_enrollment > 30:
+                st.markdown(
+                    "<div class='action-item-box'>"
+                    "<div class='action-item-title'>c) Optimasi Rekrutmen & Retensi</div>"
+                    "- **Target**: Mahasiswa internasional dan usia dewasa (>30 tahun).<br>"
+                    "- **Aksi**: Siapkan program orientasi khusus (bahasa, budaya, jaringan alumni). Kembangkan kelas <i>evening attendance</i> untuk fleksibilitas.<br>"
+                    "- **Metrik Sukses**: Peningkatan 25% retensi siswa internasional dalam 18 bulan."
+                    "</div>", unsafe_allow_html=True
+                )
+            if not ( (current_ipk1 < 2.5 or current_proporsi_sks_1 < 0.5) or
+                     (current_debtor_status == 1 and current_mothers_occupation == 9) or
+                     (current_international_status == 1 and current_age_at_enrollment > 30) ):
+                st.info("Berdasarkan data yang dimasukkan, tidak ada rekomendasi action item spesifik yang cocok untuk kasus ini. Namun, intervensi umum tetap disarankan.")
+
+
+        else: # status == "Graduate"
             st.markdown(
-                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div><br>",
+                f"<div class='success-box'>Status Prediksi: <b>{status}</b></div>",
                 unsafe_allow_html=True
             )
             st.success("Bagus! Mahasiswa ini diprediksi akan Lulus.")
@@ -294,14 +352,14 @@ if st.button("Prediksi Status"):
         st.info(f"Probabilitas Keluar (Dropout): **{probabilities[1]*100:.2f}%**")
 
         st.markdown("---")
-        # st.subheader("Fitur yang Digunakan dalam Prediksi")
-        # # Menampilkan fitur input beserta fitur turunan
-        # st.json(final_input_for_prediction.iloc[0].to_dict())
+        st.subheader("Fitur yang Digunakan dalam Prediksi")
+        # Menampilkan fitur input beserta fitur turunan
+        st.json(final_input_for_prediction.iloc[0].to_dict())
 
-# Penjelasan Singkat Aplikasi
+# --- Penjelasan Singkat Aplikasi ---
 st.sidebar.title("Tentang Aplikasi Ini")
 st.sidebar.info(
-    "Aplikasi ini menggunakan model Machine Learning (terbaik dari Random Forest) "
+    "Aplikasi ini menggunakan model Machine Learning (terbaik dari Random Forest, XGBoost, dan SVM) "
     "untuk memprediksi status kelulusan mahasiswa (Lulus/Dropout). "
     "Model dilatih dengan data historis untuk mengidentifikasi pola yang mengarah pada dropout."
     "\n\n"
@@ -313,7 +371,9 @@ st.sidebar.markdown(
     - Prediksi real-time status mahasiswa.
     - Menampilkan probabilitas untuk setiap status.
     - Memberikan gambaran fitur-fitur yang digunakan.
+    - **Baru**: Rekomendasi action item spesifik untuk kasus dropout.
     """
 )
 st.sidebar.markdown("---")
-st.sidebar.write("Dibuat dengan Spirit 🔥🔥🔥")
+st.sidebar.write("Dibuat dengan Spirit 🔥🔥🔥 oleh m_iqbalha")
+
