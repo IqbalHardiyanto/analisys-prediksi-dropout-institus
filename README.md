@@ -13,6 +13,10 @@ Jaya Jaya Institut mengalami **tingkat dropout siswa yang tinggi**, berdampak pa
 
 ---
 
+Sumber Dataset: [Predict Students&#39; Dropout and Academic Success](https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success)
+
+---
+
 #### Mengimplementasikan prototipe aplikasi Streamlit, harap ikuti prosedur berikut secara cermat:
 
 1. Persiapan Lingkungan Python
