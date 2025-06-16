@@ -2,15 +2,60 @@
 
 ### **Business Understanding**
 
-**a) Permasalahan Bisnis**  
+**a) Permasalahan Bisnis**
 Jaya Jaya Institut mengalami **tingkat dropout siswa yang tinggi**, berdampak pada reputasi akademis dan keberlanjutan institusi. Deteksi dini siswa berisiko dropout diperlukan untuk memberikan intervensi tepat waktu, mempertahankan kualitas lulusan, dan meminimalkan kerugian operasional.
 
-**b) Cakupan Proyek**  
-Proyek ini berfokus pada:
+**b) Cakupan Proyek**Proyek ini berfokus pada:
 
 1. **Analisis Data Historis**: Menyelidiki faktor-faktor yang memengaruhi status siswa (Dropout, Enrolled, Graduate).
 2. **Prediksi Risiko Dropout**: Membangun model klasifikasi berbasis fitur akademik, demografi, dan sosio-ekonomi.
 3. **Identifikasi Pola Kritis**: Menemukan indikator utama penyebab dropout (misal: kinerja akademik, status keuangan, atau latar belakang keluarga).
+
+---
+
+#### Mengimplementasikan prototipe aplikasi Streamlit, harap ikuti prosedur berikut secara cermat:
+
+1. Persiapan Lingkungan Python
+   Pastikan sistem Anda telah terinstal Python (disarankan versi 3.9 atau lebih tinggi) dan pip (sebagai sistem manajemen paket Python).
+2. Instalasi Pustaka yang Diperlukan
+   Silakan buka antarmuka Terminal atau Command Prompt Anda, kemudian eksekusi perintah berikut untuk menginstal seluruh pustaka Python:
+
+```
+pip install streamlit pandas scikit-learn xgboost
+```
+
+3. Pengaturan Struktur Direktori Proyek
+   Pastikan struktur direktori proyek Anda terorganisir dengan baik dan sesuai dengan ekspektasi aplikasi app.py:
+
+```
+your_project_folder/
+├── app.py (File aplikasi Streamlit)
+├── data.csv (File dataset Anda)
+└── models/
+├── best_model.joblib
+└── preprocessor.joblib
+```
+
+Pastikan app.py, data.csv, dan direktori models/ berada dalam satu direktori yang sama.
+
+4. Peluncuran Aplikasi Streamlit
+   Setelah seluruh persiapan di atas rampung, buka kembali antarmuka Terminal atau Command Prompt Anda dan navigasikan ke direktori your_project_folder:
+
+```
+cd path/to/your_project_folder
+```
+
+(Harap ganti path/to/your_project_folder dengan jalur absolut ke direktori proyek Anda.)
+
+Selanjutnya, eksekusi perintah berikut untuk meluncurkan aplikasi Streamlit:
+
+```
+streamlit run app.py
+```
+
+5. Akses Aplikasi melalui Peramban Web
+   Segera setelah perintah di atas dieksekusi, Streamlit akan secara otomatis membuka aplikasi di peramban web default Anda (umumnya pada alamat http://localhost:8501).
+6. Streamlit Community Cloud: [Prototipe](https://6xnygjgyqw5vjxvh4xd6w6.streamlit.app/)
 
 ---
 
