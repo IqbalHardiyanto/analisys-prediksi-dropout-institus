@@ -132,7 +132,7 @@ st.markdown(
 )
 
 st.title("🎓 Prediksi Status Kelulusan Mahasiswa")
-st.markdown("Aplikasi ini memprediksi apakah seorang mahasiswa cenderung **Lulus (Graduate)** atau **Keluar (Dropout)** berdasarkan data akademik dan demografi.")
+st.markdown("Aplikasi ini memprediksi apakah seorang mahasiswa cenderung Lulus (Graduate) atau Keluar (Dropout) berdasarkan data akademik dan demografi.")
 
 # --- Formulir Input Data Mahasiswa ---
 st.header("Masukkan Data Mahasiswa")
@@ -306,9 +306,9 @@ if st.button("Prediksi Status"):
                 st.markdown(
                     "<div class='action-item-box'>"
                     "<div class='action-item-title'>a) Program Intervensi Akademik</div>"
-                    "- **Target**: Mahasiswa dengan kinerja semester pertama buruk (IPK & proporsi SKS rendah).<br>"
-                    "- **Aksi**: Berikan <i>remedial class</i> gratis dan pendampingan mentor akademik. Monitor perkembangan melalui <i>early warning system</i>.<br>"
-                    "- **Metrik Sukses**: Penurunan 30% dropout pada kelompok ini dalam 1 tahun."
+                    "- Target: Mahasiswa dengan kinerja semester pertama buruk (IPK & proporsi SKS rendah).<br>"
+                    "- Aksi: Berikan <i>remedial class</i> gratis dan pendampingan mentor akademik. Monitor perkembangan melalui <i>early warning system</i>.<br>"
+                    "- Metrik Sukses: Penurunan 30% dropout pada kelompok ini dalam 1 tahun."
                     "</div>", unsafe_allow_html=True
                 )
 
@@ -317,9 +317,9 @@ if st.button("Prediksi Status"):
                 st.markdown(
                     "<div class='action-item-box'>"
                     "<div class='action-item-title'>b) Dukungan Finansial & Sosial</div>"
-                    "- **Target**: Mahasiswa <i>debtor</i> dan status ekonomi rendah (pekerjaan ibu: Pekerja Tidak Terampil/Jasa).<br>"
-                    "- **Aksi**: Tingkatkan akses beasiswa dan <i>flexible payment plan</i>. Buka layanan konseling untuk masalah non-akademik.<br>"
-                    "- **Metrik Sukses**: Penurunan 40% siswa <i>debtor</i> yang dropout dalam 2 tahun."
+                    "- Target: Mahasiswa <i>debtor</i> dan status ekonomi rendah (pekerjaan ibu: Pekerja Tidak Terampil/Jasa).<br>"
+                    "- Aksi: Tingkatkan akses beasiswa dan <i>flexible payment plan</i>. Buka layanan konseling untuk masalah non-akademik.<br>"
+                    "- Metrik Sukses: Penurunan 40% siswa <i>debtor</i> yang dropout dalam 2 tahun."
                     "</div>", unsafe_allow_html=True
                 )
 
@@ -328,9 +328,9 @@ if st.button("Prediksi Status"):
                 st.markdown(
                     "<div class='action-item-box'>"
                     "<div class='action-item-title'>c) Optimasi Rekrutmen & Retensi</div>"
-                    "- **Target**: Mahasiswa internasional dan usia dewasa (>30 tahun).<br>"
-                    "- **Aksi**: Siapkan program orientasi khusus (bahasa, budaya, jaringan alumni). Kembangkan kelas <i>evening attendance</i> untuk fleksibilitas.<br>"
-                    "- **Metrik Sukses**: Peningkatan 25% retensi siswa internasional dalam 18 bulan."
+                    "- Target: Mahasiswa internasional dan usia dewasa (>30 tahun).<br>"
+                    "- Aksi: Siapkan program orientasi khusus (bahasa, budaya, jaringan alumni). Kembangkan kelas <i>evening attendance</i> untuk fleksibilitas.<br>"
+                    "- Metrik Sukses: Peningkatan 25% retensi siswa internasional dalam 18 bulan."
                     "</div>", unsafe_allow_html=True
                 )
             if not ( (current_ipk1 < 2.5 or current_proporsi_sks_1 < 0.5) or
@@ -348,13 +348,13 @@ if st.button("Prediksi Status"):
 
         st.write("---")
         st.subheader("Probabilitas Prediksi")
-        st.info(f"Probabilitas Lulus (Graduate): **{probabilities[0]*100:.2f}%**")
-        st.info(f"Probabilitas Keluar (Dropout): **{probabilities[1]*100:.2f}%**")
+        st.info(f"Probabilitas Lulus (Graduate): {probabilities[0]*100:.2f}%")
+        st.info(f"Probabilitas Keluar (Dropout): {probabilities[1]*100:.2f}%")
 
         st.markdown("---")
         st.subheader("Fitur yang Digunakan dalam Prediksi")
         # Menampilkan fitur input beserta fitur turunan
-        st.json(final_input_for_prediction.iloc[0].to_dict())
+        # st.json(final_input_for_prediction.iloc[0].to_dict())
 
 # --- Penjelasan Singkat Aplikasi ---
 st.sidebar.title("Tentang Aplikasi Ini")
@@ -367,11 +367,11 @@ st.sidebar.info(
 )
 st.sidebar.markdown(
     """
-    **Fitur Utama:**
+    Fitur Utama:
     - Prediksi real-time status mahasiswa.
     - Menampilkan probabilitas untuk setiap status.
     - Memberikan gambaran fitur-fitur yang digunakan.
-    - **Baru**: Rekomendasi action item spesifik untuk kasus dropout.
+    - Baru: Rekomendasi action item spesifik untuk kasus dropout.
     """
 )
 st.sidebar.markdown("---")
