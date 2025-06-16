@@ -4,6 +4,14 @@ import joblib
 import numpy as np
 import os # Untuk memeriksa keberadaan file
 
+# --- Konfigurasi Halaman Streamlit ---
+# st.set_page_config() HARUS menjadi perintah Streamlit pertama yang dipanggil.
+st.set_page_config(
+    page_title="Prediksi Status Kelulusan Mahasiswa",
+    page_icon="🎓",
+    layout="centered"
+)
+
 # --- Helper Functions (dari kode ML Anda) ---
 # Fungsi untuk menambahkan fitur turunan yang sama seperti saat pelatihan model
 def inference_derived_features(input_df):
@@ -36,14 +44,14 @@ def inference_derived_features(input_df):
 # --- Load Model dan Preprocessor ---
 @st.cache_resource # Cache resource agar model tidak dimuat ulang setiap kali ada interaksi UI
 def load_model_and_preprocessor():
-    model_path = 'model/best_model.joblib'
-    preprocessor_path = 'model/preprocessor.joblib'
+    model_path = 'models/best_model.joblib'
+    preprocessor_path = 'models/preprocessor.joblib'
 
     if not os.path.exists(model_path) or not os.path.exists(preprocessor_path):
         st.error(
             "File model atau preprocessor tidak ditemukan! "
             "Pastikan Anda telah menjalankan skrip ML asli untuk melatih dan menyimpan model, "
-            "dan file-file tersebut berada di folder 'model/'."
+            "dan file-file tersebut berada di folder 'models/'."
         )
         st.stop() # Hentikan eksekusi aplikasi jika file tidak ditemukan
 
@@ -59,12 +67,6 @@ def load_model_and_preprocessor():
 
 model = load_model_and_preprocessor()
 
-# --- Konfigurasi Halaman Streamlit ---
-st.set_page_config(
-    page_title="Prediksi Status Kelulusan Mahasiswa",
-    page_icon="🎓",
-    layout="centered"
-)
 
 st.markdown(
     """
@@ -323,5 +325,4 @@ st.sidebar.markdown(
     """
 )
 st.sidebar.markdown("---")
-st.sidebar.write("Dibuat dengan ❤️ oleh m_iqbalh")
-
+st.sidebar.write("Dibuat dengan spirit 🔥🔥🚀 ")
